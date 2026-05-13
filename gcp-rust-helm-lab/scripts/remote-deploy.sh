@@ -17,7 +17,7 @@ if ! command -v helm >/dev/null 2>&1; then
   curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 fi
 
-sudo k3s ctr images import --namespace k8s.io "$IMAGE_ARCHIVE"
+sudo k3s ctr --namespace k8s.io images import "$IMAGE_ARCHIVE"
 
 helm upgrade --install "$RELEASE_NAME" "$CHART_DIR" \
   --kubeconfig /etc/rancher/k3s/k3s.yaml \

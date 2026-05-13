@@ -54,13 +54,13 @@ docker buildx build --platform linux/amd64 --load -t "${IMAGE_REPOSITORY}:${IMAG
 docker save "${IMAGE_REPOSITORY}:${IMAGE_TAG}" -o "$IMAGE_ARCHIVE"
 
 echo "Copying image, Helm chart, and remote deploy helper to ${VM_NAME}..."
-gcloud compute scp "$IMAGE_ARCHIVE" "${VM_NAME}:/tmp/rust-api-image.tar" --zone "$VM_ZONE"
-gcloud compute ssh "$VM_NAME" --zone "$VM_ZONE" --command "rm -rf /tmp/rust-api-chart /tmp/remote-deploy.sh"
-gcloud compute scp --recurse "$CHART_DIR" "${VM_NAME}:/tmp/rust-api-chart" --zone "$VM_ZONE"
-gcloud compute scp "$ROOT_DIR/scripts/remote-deploy.sh" "${VM_NAME}:/tmp/remote-deploy.sh" --zone "$VM_ZONE"
+gcloud compute scp "$IMAGE_ARCHIVE" "${VM_NAME}:/tmp/rust-api-image.tar" --zone "$VM_ZONE" --tunnel-through-iap
+gcloud compute ssh "$VM_NAME" --zone "$VM_ZONE" --tunnel-through-iap --command "rm -rf /tmp/rust-api-chart /tmp/remote-deploy.sh"
+gcloud compute scp --recurse "$CHART_DIR" "${VM_NAME}:/tmp/rust-api-chart" --zone "$VM_ZONE" --tunnel-through-iap
+gcloud compute scp "$ROOT_DIR/scripts/remote-deploy.sh" "${VM_NAME}:/tmp/remote-deploy.sh" --zone "$VM_ZONE" --tunnel-through-iap
 
 echo "Deploying Helm release ${RELEASE_NAME} to k3s..."
-gcloud compute ssh "$VM_NAME" --zone "$VM_ZONE" --command "chmod +x /tmp/remote-deploy.sh && IMAGE_REPOSITORY='${IMAGE_REPOSITORY}' IMAGE_TAG='${IMAGE_TAG}' RELEASE_NAME='${RELEASE_NAME}' NAMESPACE='${NAMESPACE}' /tmp/remote-deploy.sh"
+gcloud compute ssh "$VM_NAME" --zone "$VM_ZONE" --tunnel-through-iap --command "chmod +x /tmp/remote-deploy.sh && IMAGE_REPOSITORY='${IMAGE_REPOSITORY}' IMAGE_TAG='${IMAGE_TAG}' RELEASE_NAME='${RELEASE_NAME}' NAMESPACE='${NAMESPACE}' /tmp/remote-deploy.sh"
 
 echo
 echo "Deployment complete."
