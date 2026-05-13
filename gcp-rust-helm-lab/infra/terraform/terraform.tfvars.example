@@ -1,0 +1,12 @@
+project_id = "your-gcp-project-id"
+
+region       = "us-east1"
+zone         = "us-east1-b"
+machine_type = "e2-micro"
+
+# Google IAP TCP forwarding range for SSH.
+iap_ssh_source_ranges = ["35.235.240.0/20"]
+
+# Public web access. The firewall permits TCP 80 and 443 from these ranges.
+web_source_ranges = ["0.0.0.0/0"]
+boot_disk_size_gb = 20

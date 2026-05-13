@@ -1,0 +1,1 @@
+Rust API release {{ .Release.Name }} is running in namespace {{ .Release.Namespace }}.

@@ -1,0 +1,9 @@
+project_id = "your-gcp-project-id"
+
+# Defaults are shown here so you can change them deliberately.
+region       = "us-east1"
+zone         = "us-east1-b"
+machine_type = "e2-micro"
+
+# Google IAP TCP forwarding range for SSH.
+ssh_source_ranges = ["35.235.240.0/20"]
