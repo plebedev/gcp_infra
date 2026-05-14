@@ -51,6 +51,12 @@ gcp-rust-helm-lab/
 
 This lab does not create GKE, Cloud NAT, load balancers, databases, GPUs, managed instance groups, or static IPs.
 
+`e2-micro` keeps the lab cheap, but it is marginal for k3s. During image import, containerd can briefly starve the Kubernetes API server and cause slow `kubectl` responses or Helm TLS timeouts. If you want a smoother end-to-end test, use:
+
+```hcl
+machine_type = "e2-small"
+```
+
 ## API
 
 The Rust service exposes:
@@ -175,6 +181,26 @@ sudo k3s kubectl get nodes
 sudo k3s kubectl get pods -n lab-rust
 sudo k3s kubectl get svc -n lab-rust
 sudo k3s kubectl logs -n lab-rust deploy/rust-api
+```
+
+## Troubleshooting k3s On e2-micro
+
+If Helm fails with a TLS handshake timeout or `sudo k3s kubectl get nodes` hangs, the VM is usually overloaded rather than unreachable. Check:
+
+```bash
+top
+free -h
+df -h
+sudo systemctl status k3s --no-pager
+sudo journalctl -u k3s -n 100 --no-pager
+sudo ss -ltnp | grep 6443
+```
+
+If port `6443` is listening but Kubernetes commands are slow, wait a minute and try again. For fewer false starts, switch `machine_type` to `e2-small` and run:
+
+```bash
+terraform -chdir=infra/terraform apply -var-file=terraform.tfvars
+./scripts/deploy.sh
 ```
 
 ## Cleanup
